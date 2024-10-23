@@ -15,9 +15,7 @@ Suite Teardown     Close Browser
 *** Test Cases ***
 Test Case 1
     Fetch Data
-    Login Users    demo    demo
     Go To Link
-    
     FOR    ${user}    IN    @{USERS}
         Go To Link
         Open Add Identity Modal
@@ -36,6 +34,7 @@ Launch Browser
     [Arguments]    ${url}=https://marmelab.com/react-admin-demo
     ${options}    Set Variable    add_argument("--start-maximized")
     Open Browser    ${url}    chrome    options=${options}
+    Login Users    demo    demo
 
 Input Text
     [Arguments]  ${locator}  ${value}
@@ -144,11 +143,11 @@ Display All Names
         ${news}    SeleniumLibrary.Get Element Attribute    ((//tbody//tr)[${i}]//td)[7]//span//*[name()='svg']    aria-label   
         ${segments}    Get Text    ((//tbody//tr)[${i}]//td)[8]
 
-        IF  ${orders} == 0
-            Append To List    ${orders_zero_list}    ${tr_text}
-        END
+        # IF  ${orders} == 0
+        #     Append To List    ${orders_zero_list}    ${tr_text}
+        # END
 
-        Set Suite Variable    ${ORDERS_ZERO_LIST}    ${orders_zero_list}
+        # Set Suite Variable    ${ORDERS_ZERO_LIST}    ${orders_zero_list}
             
 
         Log To Console    ---------- User ${i} ----------
@@ -169,11 +168,36 @@ Wait WebElement to Load
     Sleep    6s
 
 Check User With Zero Order
-    ${orderz_zero_length}    Get Length    ${ORDERS_ZERO_LIST}
+    # ${orderz_zero_length}    Get Length    ${ORDERS_ZERO_LIST}
 
-    IF  ${orderz_zero_length} > 0
-        Fail    Users with zero orders ${ORDERS_ZERO_LIST}
+    # IF  ${orderz_zero_length} > 0
+    #     Fail    Users with zero orders ${ORDERS_ZERO_LIST}
+    # END
+
+    Wait WebElement to Load
+    ${web_elems}    Get WebElements    //tbody//tr
+    ${len}    Get Length    ${web_elems}
+
+    ${list_of_users_with_zero_orders}    Create List
+
+    FOR    ${i}    IN RANGE    1    ${len}+1
+       ${name}    Get Text    ((//tbody//tr)[${i}]//td)[2]
+       ${orders}    Get Text    ((//tbody//tr)[${i}]//td)[4]
+
+       IF    '${orders}'=='0'
+          ${name}    Evaluate    """${name}""".replace("\\n","")[1:]     
+           Append To List    ${list_of_users_with_zero_orders}    ${name} 
+        #    Log To Console    ${name}
+       END
     END
+    
+    ${found_no_orders}    Evaluate    len(${list_of_users_with_zero_orders})
+    Log To Console    ${found_no_orders}
+    IF    ${found_no_orders}>0
+       Log To Console    \n\nUsers with 0 orders found.
+       Fail    ${list_of_users_with_zero_orders} 
+    END
+
 
 
     
