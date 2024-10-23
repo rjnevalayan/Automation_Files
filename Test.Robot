@@ -143,12 +143,6 @@ Display All Names
         ${news}    SeleniumLibrary.Get Element Attribute    ((//tbody//tr)[${i}]//td)[7]//span//*[name()='svg']    aria-label   
         ${segments}    Get Text    ((//tbody//tr)[${i}]//td)[8]
 
-        # IF  ${orders} == 0
-        #     Append To List    ${orders_zero_list}    ${tr_text}
-        # END
-
-        # Set Suite Variable    ${ORDERS_ZERO_LIST}    ${orders_zero_list}
-            
 
         Log To Console    ---------- User ${i} ----------
         Log To Console    ${user_status} : ${tr_text}
@@ -168,12 +162,6 @@ Wait WebElement to Load
     Sleep    6s
 
 Check User With Zero Order
-    # ${orderz_zero_length}    Get Length    ${ORDERS_ZERO_LIST}
-
-    # IF  ${orderz_zero_length} > 0
-    #     Fail    Users with zero orders ${ORDERS_ZERO_LIST}
-    # END
-
     Wait WebElement to Load
     ${web_elems}    Get WebElements    //tbody//tr
     ${len}    Get Length    ${web_elems}
